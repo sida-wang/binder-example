@@ -61,7 +61,7 @@ distribution = 'Discrete'
 cities = {
     'Austin': {
         'airport': 'AUS',
-        'title': 'TEST, TX',
+        'title': 'Austin, TX',
     },
     'Boston': {
         'airport': 'BOS',
