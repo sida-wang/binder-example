@@ -55,12 +55,12 @@ def update_plot(attrname, old, new):
     src = get_dataset(df, cities[city]['airport'], distribution_select.value)
     source.data.update(src.data)
 
-city = 'Austin'
+city = 'TEST'
 distribution = 'Discrete'
 
 cities = {
     'Austin': {
-        'airport': 'AUS',
+        'airport': 'TEST',
         'title': 'Austin, TX',
     },
     'Boston': {
