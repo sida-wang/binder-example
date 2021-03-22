@@ -1,6 +1,6 @@
 import pandas as pd
 
-from bokeh.io import curdoc
+from bokeh.io import curdoc, show, output_notebook
 from bokeh.layouts import row, column
 from bokeh.models import (CDSView, ColorBar, ColumnDataSource,
                           CustomJS, CustomJSFilter, 
@@ -11,6 +11,7 @@ from bokeh.models import (CDSView, ColorBar, ColumnDataSource,
                           Toggle)
 from bokeh.plotting import figure
 from bokeh.tile_providers import CARTODBPOSITRON, get_provider
+#output_notebook()
 
 def toggle_callback(toggle):
     js=CustomJS(args=dict(toggle=toggle), code="""
@@ -47,6 +48,8 @@ p = figure(plot_width=1000,
             title='Bores', output_backend='webgl')
 p.add_tile(tile_provider)
 
+filter_list = {}
+
 for var in ['var1', 'var2', 'var3']:
     min_ = 0
     max_ = 100
@@ -60,5 +63,6 @@ controls = column([row(filter.slider_, filter.toggle_) for key, filter in filter
 
 layout = row(controls, p)
 
-curdoc().add_root(row(plot, controls))
-curdoc().title = "Weather"
+#show(layout)
+curdoc().add_root(layout)
+#curdoc().title = "Weather"
