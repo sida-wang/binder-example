@@ -28,11 +28,7 @@ def toggle_callback(toggle):
     }
 """)
     return js
-
-def update_plot(attrname, old, new):
-    gdf.active = (gdf['0'] >= new[0]) & (gdf['0'] <= new[1])
-    geosource.geojson = gdf.to_json()
-    
+   
   
 class Filter:
 
@@ -55,6 +51,8 @@ test_points = [Point(i) for i in zip(xpoints, ypoints)]
 gdf = gpd.GeoDataFrame(np.random.randint(0,100,npoints), geometry=test_points)
 gdf['active'] = True
 geosource = GeoJSONDataSource(geojson=gdf.to_json())
+
+
 
 test_view = CDSView(source=geosource, filters=[BooleanFilter(booleans=gdf.active)])
 
@@ -83,6 +81,11 @@ for var in ['var1', 'var2', 'var3']:
     toggle = Toggle(label="Inactive", button_type="danger", aspect_ratio=3)
     toggle.js_on_click(toggle_callback(toggle))
     filter_list[var] = Filter(var, slider, toggle)
+    
+
+def update_plot(attrname, old, new):
+    gdf.active = (gdf['0'] >= new[0]) & (gdf['0'] <= new[1])
+    geosource.geojson = gdf.to_json()
 
 filter_list['var1'].slider_.on_change('value',update_plot)
     
