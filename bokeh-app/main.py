@@ -84,8 +84,7 @@ for var in ['var1', 'var2', 'var3']:
     
 
 def update_plot(attrname, old, new):
-    #gdf.active = (gdf[0] >= new[0]) & (gdf[0] <= new[1])
-    gdf.active = False
+    gdf.active = (gdf[0] >= new[0]) & (gdf[0] <= new[1])
     p.title.text=f'{np.sum(gdf.active)}'
     #p.title.text=f'{np.sum(gdf[0] <= new[1])}'
     #geosource.geojson = gdf.to_json()
