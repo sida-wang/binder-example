@@ -1,4 +1,6 @@
 import pandas as pd
+import numpy as np
+from shapely.geometry import Point
 
 from bokeh.io import curdoc, show, output_notebook
 from bokeh.layouts import row, column
@@ -6,7 +8,7 @@ from bokeh.models import (CDSView, ColorBar, ColumnDataSource,
                           CustomJS, CustomJSFilter, 
                           GeoJSONDataSource, HoverTool,
                           LinearColorMapper, Slider, ContinuousColorMapper,
-                          Slider,
+                          BooleanFilter,
                           TapTool, OpenURL, Circle, RangeSlider, CheckboxButtonGroup,
                           Toggle)
 from bokeh.plotting import figure
@@ -26,6 +28,11 @@ def toggle_callback(toggle):
 """)
     return js
 
+def update_plot(attrname, old, new):
+    gdf.active = (gdf['0'] >= new[0]) & (gdf['0'] <= new[1])
+    geosource = GeoJSONDataSource(geojson=gdf.to_json())
+    
+  
 class Filter:
 
     def __init__(self, name, slider, toggle):
@@ -37,6 +44,19 @@ STATISTICS = ['record_min_temp', 'actual_min_temp', 'average_min_temp', 'average
 X_RANGE = [16000000, 16600000]
 Y_RANGE = [-4850000, -4150000]
 
+npoints = 100
+
+xpoints = np.random.randint(X_RANGE[0],X_RANGE[1],npoints)
+ypoints = np.random.randint(Y_RANGE[0],Y_RANGE[1],npoints)
+
+test_points = [Point(i) for i in zip(xpoints, ypoints)]
+
+gdf = gpd.GeoDataFrame(np.random.randint(0,100,npoints), geometry=test_points)
+gdf['active'] = True
+geosource = GeoJSONDataSource(geojson=gdf.to_json())
+
+test_view = CDSView(source=geosource, filters=[BooleanFilter(booleans=gdf.active)])
+
 tile_provider = get_provider('CARTODBPOSITRON')
 
 tools = ["pan, wheel_zoom, box_zoom, reset, tap"]
@@ -47,6 +67,10 @@ p = figure(plot_width=1000,
             x_range=X_RANGE, y_range=Y_RANGE, tools=tools,
             title='Bores', output_backend='webgl')
 p.add_tile(tile_provider)
+points_render = p.circle(x='x',y='y', source=geosource, view=test_view, size=10)
+
+p.add_tools(HoverTool(renderers=[points_render],
+                      tooltips=[('Number','@0')]))
 
 filter_list = {}
 
@@ -59,6 +83,8 @@ for var in ['var1', 'var2', 'var3']:
     toggle.js_on_click(toggle_callback(toggle))
     filter_list[var] = Filter(var, slider, toggle)
 
+filter_list['var1'].slider_.on_change('value',update_plot)
+    
 controls = column([row(filter.slider_, filter.toggle_) for key, filter in filter_list.items()])
 
 layout = row(controls, p)
