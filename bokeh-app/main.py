@@ -31,7 +31,7 @@ def toggle_callback(toggle):
 
 def update_plot(attrname, old, new):
     gdf.active = (gdf['0'] >= new[0]) & (gdf['0'] <= new[1])
-    geosource = GeoJSONDataSource(geojson=gdf.to_json())
+    geosource.geojson = gdf.to_json()
     
   
 class Filter:
