@@ -2,8 +2,15 @@ import pandas as pd
 
 from bokeh.io import curdoc
 from bokeh.layouts import row, column
-from bokeh.models import ColumnDataSource, DataRange1d, Select
+from bokeh.models import (CDSView, ColorBar, ColumnDataSource,
+                          CustomJS, CustomJSFilter, 
+                          GeoJSONDataSource, HoverTool,
+                          LinearColorMapper, Slider, ContinuousColorMapper,
+                          Slider,
+                          TapTool, OpenURL, Circle, RangeSlider, CheckboxButtonGroup,
+                          Toggle)
 from bokeh.plotting import figure
+from bokeh.tile_providers import CARTODBPOSITRON, get_provider
 
 def toggle_callback(toggle):
     js=CustomJS(args=dict(toggle=toggle), code="""
