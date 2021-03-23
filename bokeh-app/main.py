@@ -54,7 +54,7 @@ geosource = GeoJSONDataSource(geojson=gdf.to_json())
 
 
 
-test_view = CDSView(source=geosource, filters=[BooleanFilter(booleans=gdf.active)])
+#test_view = CDSView(source=geosource, filters=[BooleanFilter(booleans=gdf.active)])
 
 tile_provider = get_provider('CARTODBPOSITRON')
 
@@ -66,7 +66,7 @@ p = figure(plot_width=1000,
             x_range=X_RANGE, y_range=Y_RANGE, tools=tools,
             title='Bores', output_backend='webgl')
 p.add_tile(tile_provider)
-points_render = p.circle(x='x',y='y', source=geosource, view=test_view, size=10)
+points_render = p.circle(x='x',y='y', source=geosource, size=10)
 
 p.add_tools(HoverTool(renderers=[points_render],
                       tooltips=[('Number','@0')]))
@@ -84,10 +84,7 @@ for var in ['var1', 'var2', 'var3']:
     
 
 def update_plot(attrname, old, new):
-    gdf.active = (gdf[0] >= new[0]) & (gdf[0] <= new[1])
-    p.title.text=f'{np.sum(gdf.active)}'
-    #p.title.text=f'{np.sum(gdf[0] <= new[1])}'
-    geosource.geojson = gdf.to_json()
+    geosource.update(geojson = gdf.loc[gdf.active].to_json())
 
 filter_list['var1'].slider_.on_change('value',update_plot)
     
