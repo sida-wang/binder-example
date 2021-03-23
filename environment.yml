@@ -1,3 +1,4 @@
+name: myenv
 dependencies:
   - bokeh
   - pandas
