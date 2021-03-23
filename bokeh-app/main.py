@@ -62,7 +62,7 @@ p = figure(plot_width=1000,
             x_range=X_RANGE, y_range=Y_RANGE, tools=tools,
             title='Bores', output_backend='webgl')
 p.add_tile(tile_provider)
-points_render = p.circle(x='x',y='y', source=geosource, view=test_view, size=10)
+points_render = p.circle(x='x',y='y', source=geosource, size=10)
 
 p.add_tools(HoverTool(renderers=[points_render],
                       tooltips=[('Number','@0')]))
