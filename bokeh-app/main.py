@@ -84,9 +84,9 @@ for var in ['var1', 'var2', 'var3']:
 
 def update_plot(attrname, old, new):
     mask = [True]*len(gdf)
-    for key, filter in filter_list.items():
-        mask = mask & (gdf.[key] >= filter.slider_.value[0]) & (gdf.[key] <= filter.slider_.value[1])
-    #mask = mask & (gdf.var1 >= filter_list['var1'].slider_.value[0]) & (gdf.var1 <= filter_list['var1'].slider_.value[1])
+    #for key, filter in filter_list.items():
+    #    mask = mask & (gdf.[key] >= filter.slider_.value[0]) & (gdf.[key] <= filter.slider_.value[1])
+    mask = mask & (gdf.var1 >= filter_list['var1'].slider_.value[0]) & (gdf.var1 <= filter_list['var1'].slider_.value[1])
     #gdf.active = (gdf.var1 >= filter_list['var1'].slider_.value[0]) & (gdf.var1 <= filter_list['var1'].slider_.value[1])
     test_view.filters[0] = BooleanFilter(booleans=mask)
 
