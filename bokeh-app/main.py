@@ -52,7 +52,7 @@ gdf = gpd.GeoDataFrame({'var1':np.random.randint(0,100,npoints)}, geometry=test_
 gdf['active'] = True
 geosource = GeoJSONDataSource(geojson=gdf.to_json())
 
-test_view = CDSView(source=geosource, filters=[BooleanFilter(booleans=gdf.active])
+test_view = CDSView(source=geosource, filters=[BooleanFilter(booleans=gdf.active)])
 
 tile_provider = get_provider('CARTODBPOSITRON')
 
@@ -67,7 +67,7 @@ p.add_tile(tile_provider)
 points_render = p.circle(x='x',y='y', source=geosource, view=test_view, size=10)
 
 p.add_tools(HoverTool(renderers=[points_render],
-                      tooltips=[('Number','@var1')]))
+                      tooltips=[('Number','@0')]))
 
 filter_list = {}
 
@@ -82,8 +82,6 @@ for var in ['var1', 'var2', 'var3']:
     
 
 def update_plot(attrname, old, new):
-    #mask = np.full(len(gdf),True,dtype=bool)
-    #mask = mask & (gdf.var1 >= new[0]) & (gdf.var1 <= new[1])
     gdf.active = (gdf[0] >= new[0]) & (gdf[0] <= new[1])
     test_view.filters[0] = BooleanFilter(booleans=gdf.active)
 
