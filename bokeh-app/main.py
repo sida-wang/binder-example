@@ -48,14 +48,11 @@ ypoints = np.random.randint(Y_RANGE[0],Y_RANGE[1],npoints)
 
 test_points = [Point(i) for i in zip(xpoints, ypoints)]
 
-gdf = gpd.GeoDataFrame({#'var1':np.random.randint(0,100,npoints),
-                        #'var2':np.random.randint(0,100,npoints),
-                        #'var3':np.random.randint(0,100,npoints),
-                        np.random.randint(0,100,npoints),
-                        geometry=test_points)
+gdf = gpd.GeoDataFrame({'var1':np.random.randint(0,100,npoints)}, geometry=test_points)
+gdf['active'] = True
 geosource = GeoJSONDataSource(geojson=gdf.to_json())
 
-test_view = CDSView(source=geosource, filters=[BooleanFilter(booleans=np.full(len(gdf),True,dtype=bool))])
+test_view = CDSView(source=geosource, filters=[BooleanFilter(booleans=gdf.active)])
 
 tile_provider = get_provider('CARTODBPOSITRON')
 
@@ -85,16 +82,10 @@ for var in ['var1', 'var2', 'var3']:
     
 
 def update_plot(attrname, old, new):
-    mask = np.full(len(gdf),True,dtype=bool)
-    #for filter in filter_list:
-    #    if filter.toggle_.active:
-    #      mask = mask & (gdf.[filter.name] >= filter.slider_.value[0]) & (gdf.[filter.name] <= filter.slider_.value[1])   
-    mask = mask & (gdf.var1 >= new[0]) & (gdf.var1 <= new[1])
-    test_view.filters[0] = BooleanFilter(booleans=mask)
+    gdf.active = (gdf.var1 >= new[0]) & (gdf.var1 <= new[1])
+    test_view.filters[0] = BooleanFilter(booleans=gdf.active)
 
 filter_list['var1'].slider_.on_change('value',update_plot)
-filter_list['var2'].slider_.on_change('value',update_plot)
-filter_list['var3'].slider_.on_change('value',update_plot)                        
     
 controls = column([row(filter.slider_, filter.toggle_) for key, filter in filter_list.items()])
 
