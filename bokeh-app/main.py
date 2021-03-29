@@ -84,7 +84,7 @@ for var in ['var1', 'var2', 'var3']:
 def update_plot(attrname, old, new):
     #mask = np.full(len(gdf),True,dtype=bool)
     #mask = mask & (gdf.var1 >= new[0]) & (gdf.var1 <= new[1])
-    gdf.active = (gdf['var1'] >= new[0]) & (gdf['var1'] <= new[1])
+    gdf.active = (gdf[0] >= new[0]) & (gdf[0] <= new[1])
     test_view.filters[0] = BooleanFilter(booleans=gdf.active)
 
 filter_list['var1'].slider_.on_change('value',update_plot)
