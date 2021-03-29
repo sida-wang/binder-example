@@ -54,7 +54,7 @@ gdf = gpd.GeoDataFrame({'var1':np.random.randint(0,100,npoints),
 gdf['active'] = True
 geosource = GeoJSONDataSource(geojson=gdf.to_json())
 
-test_view = CDSView(source=geosource, filters=[BooleanFilter(booleans=np.full(len(gdf),True,dtype=bool)])
+test_view = CDSView(source=geosource, filters=[BooleanFilter(booleans=np.full(len(gdf),True,dtype=bool))])
 
 tile_provider = get_provider('CARTODBPOSITRON')
 
