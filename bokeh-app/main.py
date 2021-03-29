@@ -48,9 +48,10 @@ ypoints = np.random.randint(Y_RANGE[0],Y_RANGE[1],npoints)
 
 test_points = [Point(i) for i in zip(xpoints, ypoints)]
 
-gdf = gpd.GeoDataFrame({'var1':np.random.randint(0,100,npoints),
-                        'var2':np.random.randint(0,100,npoints),
-                        'var3':np.random.randint(0,100,npoints),
+gdf = gpd.GeoDataFrame({#'var1':np.random.randint(0,100,npoints),
+                        #'var2':np.random.randint(0,100,npoints),
+                        #'var3':np.random.randint(0,100,npoints),
+                        np.random.randint(0,100,npoints),
                         geometry=test_points)
 geosource = GeoJSONDataSource(geojson=gdf.to_json())
 
@@ -85,10 +86,10 @@ for var in ['var1', 'var2', 'var3']:
 
 def update_plot(attrname, old, new):
     mask = np.full(len(gdf),True,dtype=bool)
-    for filter in filter_list:
-        if filter.toggle_.active:
-          mask = mask & (gdf.[filter.name] >= filter.slider_.value[0]) & (gdf.[filter.name] <= filter.slider_.value[1])   
-    #gdf.active = (gdf.var1 >= new[0]) & (gdf.var1 <= new[1])
+    #for filter in filter_list:
+    #    if filter.toggle_.active:
+    #      mask = mask & (gdf.[filter.name] >= filter.slider_.value[0]) & (gdf.[filter.name] <= filter.slider_.value[1])   
+    mask = mask & (gdf.var1 >= new[0]) & (gdf.var1 <= new[1])
     test_view.filters[0] = BooleanFilter(booleans=mask)
 
 filter_list['var1'].slider_.on_change('value',update_plot)
