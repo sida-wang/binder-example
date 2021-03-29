@@ -51,6 +51,7 @@ test_points = [Point(i) for i in zip(xpoints, ypoints)]
 gdf = gpd.GeoDataFrame({'var1':np.random.randint(0,100,npoints),
                        'var2':np.random.randint(0,100,npoints),
                        'var3':np.random.randint(0,100,npoints)}, geometry=test_points)
+gdf['active'] = True
 geosource = GeoJSONDataSource(geojson=gdf.to_json())
 
 test_view = CDSView(source=geosource, filters=[BooleanFilter(booleans=[True]*len(gdf))])
@@ -84,8 +85,7 @@ for var in ['var1', 'var2', 'var3']:
 
 def update_plot(attrname, old, new):
     mask = [True]*len(gdf)
-    #for key,filter in filter_list:
-    mask = mask & (gdf.['var1'] >= filter_list['var1'].slider_.value[0]) & (gdf.['var1] <= filter_list['var1'].slider_.value[1])
+    mask = mask & (gdf.var1 >= filter_list['var1'].slider_.value[0]) & (gdf.var1 <= filter_list['var1'].slider_.value[1])
     #gdf.active = (gdf.var1 >= filter_list['var1'].slider_.value[0]) & (gdf.var1 <= filter_list['var1'].slider_.value[1])
     test_view.filters[0] = BooleanFilter(booleans=mask)
 
