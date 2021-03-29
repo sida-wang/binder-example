@@ -49,7 +49,7 @@ ypoints = np.random.randint(Y_RANGE[0],Y_RANGE[1],npoints)
 test_points = [Point(i) for i in zip(xpoints, ypoints)]
 
 gdf = gpd.GeoDataFrame({'var1':np.random.randint(0,100,npoints)}, geometry=test_points)
-gdf.active=True
+gdf['active'] = True
 geosource = GeoJSONDataSource(geojson=gdf.to_json())
 
 test_view = CDSView(source=geosource, filters=[BooleanFilter(booleans=gdf.active])
