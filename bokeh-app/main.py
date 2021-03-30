@@ -68,7 +68,9 @@ p.add_tile(tile_provider)
 points_render = p.circle(x='x',y='y', source=geosource, view=test_view, size=10)
 
 p.add_tools(HoverTool(renderers=[points_render],
-                      tooltips=[('Number','@var1')]))
+                      tooltips=[('Var1','@var1'),
+                               ('Var2','@var2'),
+                               ('Var3','@var3')]))
 
 filter_list = {}
 
