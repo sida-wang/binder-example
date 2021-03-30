@@ -88,7 +88,8 @@ def update_plot(attrname, old, new):
         mask = mask & (gdf[key] >= filter.slider_.value[0]) & (gdf[key] <= filter.slider_.value[1])
     test_view.filters[0] = BooleanFilter(booleans=mask)
 
-filter_list['var1'].slider_.on_change('value',update_plot)
+for _,filter in filter_list.items():
+    filter.slider_.on_change('value',update_plot)
     
 controls = column([row(filter.slider_, filter.toggle_) for key, filter in filter_list.items()])
 
