@@ -91,6 +91,7 @@ def update_plot(attrname, old, new):
 
 for _,filter in filter_list.items():
     filter.slider_.on_change('value',update_plot)
+    filter.toggle_.on_change('active',update_plot)
     
 controls = column([row(filter.slider_, filter.toggle_) for key, filter in filter_list.items()])
 
