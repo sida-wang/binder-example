@@ -71,6 +71,7 @@ p.add_tools(HoverTool(renderers=[points_render],
                       tooltips=[('Var1','@var1'),
                                ('Var2','@var2'),
                                ('Var3','@var3')]))
+p.add_tools(HelpTool(redirect='https://wikipedia.org'))
 
 filter_list = {}
 
