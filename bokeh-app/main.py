@@ -1,89 +1,105 @@
-from os.path import join, dirname
-import datetime
-
 import pandas as pd
-from scipy.signal import savgol_filter
+import geopandas as gpd
+import numpy as np
+from shapely.geometry import Point
 
-from bokeh.io import curdoc
+from bokeh.io import curdoc, show, output_notebook
 from bokeh.layouts import row, column
-from bokeh.models import ColumnDataSource, DataRange1d, Select
-from bokeh.palettes import Blues4
+from bokeh.models import (CDSView, ColorBar, ColumnDataSource,
+                          CustomJS, CustomJSFilter, 
+                          GeoJSONDataSource, HoverTool,
+                          LinearColorMapper, Slider, ContinuousColorMapper,
+                          BooleanFilter, HelpTool,
+                          TapTool, OpenURL, Circle, RangeSlider, CheckboxButtonGroup,
+                          Toggle)
 from bokeh.plotting import figure
+from bokeh.tile_providers import CARTODBPOSITRON, get_provider
+#output_notebook()
+
+def toggle_callback(toggle):
+    js=CustomJS(args=dict(toggle=toggle), code="""
+    if (toggle.button_type=="danger") {
+    toggle.button_type="success"
+    toggle.label='Active'
+    }
+    else {
+    toggle.button_type="danger"
+    toggle.label='Inactive'    
+    }
+""")
+    return js
+   
+  
+class Filter:
+
+    def __init__(self, name, slider, toggle):
+        self.name = name
+        self.slider_ = slider
+        self.toggle_ = toggle
 
 STATISTICS = ['record_min_temp', 'actual_min_temp', 'average_min_temp', 'average_max_temp', 'actual_max_temp', 'record_max_temp']
+X_RANGE = [16000000, 16600000]
+Y_RANGE = [-4850000, -4150000]
 
-def get_dataset(src, name, distribution):
-    df = src[src.airport == name].copy()
-    del df['airport']
-    df['date'] = pd.to_datetime(df.date)
-    # timedelta here instead of pd.DateOffset to avoid pandas bug < 0.18 (Pandas issue #11925)
-    df['left'] = df.date - datetime.timedelta(days=0.5)
-    df['right'] = df.date + datetime.timedelta(days=0.5)
-    df = df.set_index(['date'])
-    df.sort_index(inplace=True)
-    if distribution == 'Smoothed':
-        window, order = 51, 3
-        for key in STATISTICS:
-            df[key] = savgol_filter(df[key], window, order)
+npoints = 100
 
-    return ColumnDataSource(data=df)
+xpoints = np.random.randint(X_RANGE[0],X_RANGE[1],npoints)
+ypoints = np.random.randint(Y_RANGE[0],Y_RANGE[1],npoints)
 
-def make_plot(source, title):
-    plot = figure(x_axis_type="datetime", plot_width=800, tools="", toolbar_location=None)
-    plot.title.text = title
+test_points = [Point(i) for i in zip(xpoints, ypoints)]
 
-    plot.quad(top='record_max_temp', bottom='record_min_temp', left='left', right='right',
-              color=Blues4[2], source=source, legend="Record")
-    plot.quad(top='average_max_temp', bottom='average_min_temp', left='left', right='right',
-              color=Blues4[1], source=source, legend="Average")
-    plot.quad(top='actual_max_temp', bottom='actual_min_temp', left='left', right='right',
-              color=Blues4[0], alpha=0.5, line_color="black", source=source, legend="Actual")
+gdf = gpd.GeoDataFrame({'var1':np.random.randint(0,100,npoints),
+                       'var2':np.random.randint(0,100,npoints),
+                       'var3':np.random.randint(0,100,npoints)}, geometry=test_points)
+geosource = GeoJSONDataSource(geojson=gdf.to_json())
 
-    # fixed attributes
-    plot.xaxis.axis_label = None
-    plot.yaxis.axis_label = "Temperature (F)"
-    plot.axis.axis_label_text_font_style = "bold"
-    plot.x_range = DataRange1d(range_padding=0.0)
-    plot.grid.grid_line_alpha = 0.3
+test_view = CDSView(source=geosource, filters=[BooleanFilter(booleans=[True]*len(gdf))])
 
-    return plot
+tile_provider = get_provider('CARTODBPOSITRON')
+
+tools = ["pan, wheel_zoom, box_zoom, reset, tap"]
+
+p = figure(plot_width=1000,
+            x_axis_type="mercator", y_axis_type="mercator",
+            x_axis_label="Longitude", y_axis_label="Latitude",
+            x_range=X_RANGE, y_range=Y_RANGE, tools=tools,
+            title='Bores', output_backend='webgl')
+p.add_tile(tile_provider)
+points_render = p.circle(x='x',y='y', source=geosource, view=test_view, size=10)
+
+p.add_tools(HoverTool(renderers=[points_render],
+                      tooltips=[('Var1','@var1'),
+                               ('Var2','@var2'),
+                               ('Var3','@var3')]))
+p.add_tools(HelpTool(redirect='https://wikipedia.org'))
+
+filter_list = {}
+
+for var in ['var1', 'var2', 'var3']:
+    min_ = 0
+    max_ = 100
+    slider = RangeSlider(start=min_, end=max_, step=0.1, 
+                         value=(min_,max_), title=f'{var} range')
+    toggle = Toggle(label="Inactive", button_type="danger", aspect_ratio=3)
+    toggle.js_on_click(toggle_callback(toggle))
+    filter_list[var] = Filter(var, slider, toggle)
+    
 
 def update_plot(attrname, old, new):
-    city = city_select.value
-    plot.title.text = "Weather data for " + cities[city]['title']
+    mask = [True]*len(gdf)
+    for key, filter in filter_list.items():
+        if filter.toggle_.active:
+            mask = mask & (gdf[key] >= filter.slider_.value[0]) & (gdf[key] <= filter.slider_.value[1])
+    test_view.filters[0] = BooleanFilter(booleans=mask)
 
-    src = get_dataset(df, cities[city]['airport'], distribution_select.value)
-    source.data.update(src.data)
+for _,filter in filter_list.items():
+    filter.slider_.on_change('value',update_plot)
+    filter.toggle_.on_change('active',update_plot)
+    
+controls = column([row(filter.slider_, filter.toggle_) for key, filter in filter_list.items()])
 
-city = 'Austin'
-distribution = 'Discrete'
+layout = row(controls, p)
 
-cities = {
-    'Austin': {
-        'airport': 'AUS',
-        'title': 'Austin, TX',
-    },
-    'Boston': {
-        'airport': 'BOS',
-        'title': 'Boston, MA',
-    },
-    'Seattle': {
-        'airport': 'SEA',
-        'title': 'Seattle, WA',
-    }
-}
-
-city_select = Select(value=city, title='City', options=sorted(cities.keys()))
-distribution_select = Select(value=distribution, title='Distribution', options=['Discrete', 'Smoothed'])
-
-df = pd.read_csv(join(dirname(__file__), 'data/2015_weather.csv'))
-source = get_dataset(df, cities[city]['airport'], distribution)
-plot = make_plot(source, "Weather data for " + cities[city]['title'])
-
-city_select.on_change('value', update_plot)
-distribution_select.on_change('value', update_plot)
-
-controls = column(city_select, distribution_select)
-
-curdoc().add_root(row(plot, controls))
-curdoc().title = "Weather"
+#show(layout)
+curdoc().add_root(layout)
+#curdoc().title = "Weather"

@@ -1,7 +1,11 @@
+name: myenv
 dependencies:
   - bokeh
   - pandas
   - scipy
+  - numpy
+  - geopandas
+  - shapely
   - pip
   - pip:
     - jupyter-server-proxy
