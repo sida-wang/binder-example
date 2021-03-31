@@ -9,7 +9,7 @@ from bokeh.models import (CDSView, ColorBar, ColumnDataSource,
                           CustomJS, CustomJSFilter, 
                           GeoJSONDataSource, HoverTool,
                           LinearColorMapper, Slider, ContinuousColorMapper,
-                          BooleanFilter,
+                          BooleanFilter, HelpTool,
                           TapTool, OpenURL, Circle, RangeSlider, CheckboxButtonGroup,
                           Toggle)
 from bokeh.plotting import figure
