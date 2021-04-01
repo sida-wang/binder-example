@@ -63,7 +63,7 @@ p = figure(plot_width=1000,
             x_axis_type="mercator", y_axis_type="mercator",
             x_axis_label="Longitude", y_axis_label="Latitude",
             x_range=X_RANGE, y_range=Y_RANGE, tools=tools,
-            title='Bores', output_backend='webgl', name="image")
+            title='Bores', output_backend='webgl')
 p.add_tile(tile_provider)
 points_render = p.circle(x='x',y='y', source=geosource, view=test_view, size=10)
 
@@ -101,5 +101,5 @@ controls = column([row(filter.slider_, filter.toggle_) for key, filter in filter
 layout = row(controls, p, name='layout')
 
 #show(layout)
-curdoc().add_root(p)
+curdoc().add_root(layout)
 #curdoc().title = "Weather"
