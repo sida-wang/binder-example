@@ -98,7 +98,7 @@ for _,filter in filter_list.items():
     
 controls = column([row(filter.slider_, filter.toggle_) for key, filter in filter_list.items()])
 
-layout = row(controls, p)
+layout = row(controls, p, name='layout')
 
 #show(layout)
 curdoc().add_root(layout)
