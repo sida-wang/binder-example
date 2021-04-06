@@ -67,8 +67,7 @@ p = figure(plot_width=1000,
 p.add_tile(tile_provider)
 points_render = p.circle(x='x',y='y', source=geosource, view=test_view, size=10)
 
-p.toolbar.logo = None
-p.toolbar.active_scroll = p.select_one(WheelZoomTool)
+#p.toolbar.logo = None
 p.add_tools(HoverTool(renderers=[points_render],
                       tooltips=[('Var1','@var1'),
                                ('Var2','@var2'),
