@@ -14,7 +14,6 @@ from bokeh.models import (CDSView, ColorBar, ColumnDataSource,
                           Toggle)
 from bokeh.plotting import figure
 from bokeh.tile_providers import CARTODBPOSITRON, get_provider
-#output_notebook()
 
 def toggle_callback(toggle):
     js=CustomJS(args=dict(toggle=toggle), code="""
@@ -67,7 +66,7 @@ p = figure(plot_width=1000,
 p.add_tile(tile_provider)
 points_render = p.circle(x='x',y='y', source=geosource, view=test_view, size=10)
 
-#p.toolbar.logo = None
+p.toolbar.logo = None
 p.add_tools(HoverTool(renderers=[points_render],
                       tooltips=[('Var1','@var1'),
                                ('Var2','@var2'),
